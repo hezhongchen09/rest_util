@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body>
+        <div class="form-container">
+            <form>
+                <div><label for="url">URL:</label></div>
+                <div><input type="text" id="url" name="url" placeholder="请输入url..."></div>
+
+                <div style="margin-top: 15px;"><label for="data">Data:</label></div>
+                <div><textarea rows="10" id="data" name="data" placeholder="请输入Data..."></textarea></div>
+
+                <div style="margin-top: 15px;"><label for="fileName">Save To File Name:</label></div>
+                <div><input type="text" id="fileName" name="fileName" placeholder="请输入fileName..."></textarea></div>
+
+                <div style="margin-top: 15px;">
+                    <button id="commit" type="button">确认</button>
+                </div>
+            </form>
+        </div>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#commit").click(function(){
+                    console.log($("#url").val());
+                    console.log($("#data").val());
+
+                    let url = $("#url").val();
+                    let data = $("#data").val();
+                    let fileName = $("#fileName").val();
+
+                    if (url == null || url == undefined || url.trim() === "") {
+                        alert("请输入url...");
+
+                        return ;
+                    }
+
+                    if (data == null || data == undefined || data.trim() === "") {
+                        alert("请输入data...");
+
+                        return ;
+                    }
+
+                    if (fileName == null || fileName == undefined || fileName.trim() === "") {
+                        alert("请输入File Name...");
+
+                        return ;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json;charset=utf-8",
+                        data: data,
+                        dataType: "json",
+                        success: function (response) {
+                            var urlObject = window.URL || window.webkitURL || window;
+
+                            var exportBlob = new Blob(
+                                ["var datasource = " + JSON.stringify(response)],
+                                {
+                                    type: 'text/plain'
+                                }
+                            );
+
+                            var saveLink = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+                            saveLink.href = urlObject.createObjectURL(exportBlob);
+                            saveLink.download = fileName;
+                            saveLink.click();
+                        },
+                        error: function (error) {
+                            alert("出错啦: "+JSON.stringify(error));
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <style type="text/css">
+            .form-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 640px;
+            }
+
+            .form-container input, .form-container textarea, .form-container button {
+                width: 100%;
+            }
+        </style>
+    </body>
+</html> 
